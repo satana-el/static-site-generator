@@ -1,5 +1,5 @@
 import unittest
-from converter import split_nodes_delimiter, text_to_textnodes, markdown_to_blocks
+from converter import split_nodes_delimiter, text_to_textnodes, markdown_to_blocks, BlockType, block_to_block_type
 from textnode import TextType, TextNode
 
 
@@ -71,3 +71,28 @@ This is the same paragraph on a new line
             ],
         )
 
+    def test_block_to_block_type(self):
+        heading = "# Heading"
+        self.assertEqual(block_to_block_type(heading), BlockType.HEADING)
+
+        code = """```
+code 1
+code 2
+```"""
+        self.assertEqual(block_to_block_type(code), BlockType.CODE)
+
+        quote = """> Hello
+> world"""
+        self.assertEqual(block_to_block_type(quote), BlockType.QUOTE)
+
+        u_list = """- one
+- two"""
+        self.assertEqual(block_to_block_type(u_list), BlockType.UNORDERED_LIST)
+
+
+        o_list ="""1. one
+2. two"""
+        self.assertEqual(block_to_block_type(o_list), BlockType.ORDERED_LIST)
+
+        para = "hello, world"
+        self.assertEqual(block_to_block_type(para), BlockType.PARAGRAPH)

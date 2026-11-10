@@ -1,5 +1,16 @@
 from textnode import TextType, TextNode
 from extract import split_nodes_link, split_nodes_image
+from enum import Enum
+
+
+class BlockType(Enum):
+    PARAGRAPH = "paragraph block"
+    HEADING = "heading block"
+    CODE = "code block"
+    QUOTE = "quote block"
+    UNORDERED_LIST = "unordered_list block"
+    ORDERED_LIST = "ordered_list block"
+
 
 def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: TextType) -> list[TextNode]:
     new_nodes: list[TextNode] = []
@@ -38,3 +49,40 @@ def markdown_to_blocks(markdown: str) -> list[str]:
         if stripped != "":
             stripped_blocks.append(stripped)
     return stripped_blocks 
+
+
+def block_to_block_type(block: str) -> BlockType:
+    headings = (
+        "# ",
+        "## ",
+        "### ",
+        "#### ",
+        "##### ",
+        "###### ",
+    )
+    if block.startswith(headings):
+        return BlockType.HEADING
+
+    lines = block.split('\n')
+
+    if lines[0] == '```' and lines[-1] == '```':
+        if (len(lines) > 1):
+            return BlockType.CODE
+
+    if all(line.startswith('>') for line in lines):
+        return BlockType.QUOTE
+    if all(line.startswith('- ') for line in lines):
+        return BlockType.UNORDERED_LIST
+
+    o_list = False
+    for i, line in enumerate(lines):
+        if line.startswith(f"{i+1}. "):
+            o_list = True
+            continue
+        o_list = False
+        break
+
+    if o_list:
+        return BlockType.ORDERED_LIST
+
+    return BlockType.PARAGRAPH
