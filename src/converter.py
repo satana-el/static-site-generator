@@ -1,6 +1,7 @@
-from textnode import TextType, TextNode
+from textnode import TextType, TextNode, text_node_to_html_node
 from extract import split_nodes_link, split_nodes_image
 from enum import Enum
+from htmlnode import HTMLNode, ParentNode
 
 
 class BlockType(Enum):
@@ -86,3 +87,58 @@ def block_to_block_type(block: str) -> BlockType:
         return BlockType.ORDERED_LIST
 
     return BlockType.PARAGRAPH
+
+
+def markdown_to_html_node(markdown: str) -> HTMLNode:
+    blocks = markdown_to_blocks(markdown)
+    children = []
+    for block in blocks:
+        type = block_to_block_type(block)
+        node = None
+        match type:
+            case BlockType.QUOTE:
+                lines = block.split("\n")
+                new_block = ""
+                for line in lines:
+                    if line.startswith("> "):
+                        new_block += f"{line[2:]}\n"
+                        continue
+                    new_block += f"{line[1:]}\n"
+                node = ParentNode("blockquote", text_to_children(new_block.strip()))
+            case BlockType.UNORDERED_LIST:
+                items = block.split("\n")
+                c_nodes = []
+                for item in items:
+                    c_nodes.append(ParentNode("li", text_to_children(item[2:])))
+                node = ParentNode("ul", c_nodes)
+            case BlockType.ORDERED_LIST:
+                items = block.split("\n")
+                c_nodes = []
+                for item in items:
+                    n, i = item.split(". ", 1)
+                    c_nodes.append(ParentNode("li", text_to_children(i)))
+                node = ParentNode("ol", c_nodes)
+            case BlockType.CODE:
+                tmp = text_node_to_html_node(TextNode(block[4:-3], TextType.CODE))
+                node = ParentNode("pre", [tmp])
+            case BlockType.HEADING:
+                n, text = block.split(" ", 1)
+                node = ParentNode(f"h{len(n)}", text_to_children(text))
+            case BlockType.PARAGRAPH:
+                lines = block.split("\n")
+                print(repr(block))
+                text = ""
+                for line in lines:
+                    text += f"{line.strip()} "
+                node = ParentNode("p", text_to_children(text.strip()))
+        children.append(node)
+    return ParentNode("div", children)
+
+
+def text_to_children(text: str) -> list[HTMLNode]:
+    nodes = text_to_textnodes(text)
+    child_nodes = []
+    for node in nodes:
+        child_nodes.append(text_node_to_html_node(node))
+
+    return child_nodes
