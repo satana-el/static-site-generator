@@ -1,5 +1,5 @@
 import unittest
-from converter import split_nodes_delimiter, text_to_textnodes, markdown_to_blocks, BlockType, block_to_block_type, markdown_to_html_node
+from converter import split_nodes_delimiter, text_to_textnodes, markdown_to_blocks, BlockType, block_to_block_type, markdown_to_html_node, extract_title
 from textnode import TextType, TextNode
 
 
@@ -129,3 +129,11 @@ the **same** even with inline stuff
             html,
             "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
         )
+
+    def test_extract_title(self):
+        md = """
+# Heading
+some text
+"""
+        heading = extract_title(md)
+        self.assertEqual(heading, "# Heading")

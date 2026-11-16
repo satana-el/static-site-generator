@@ -126,7 +126,6 @@ def markdown_to_html_node(markdown: str) -> HTMLNode:
                 node = ParentNode(f"h{len(n)}", text_to_children(text))
             case BlockType.PARAGRAPH:
                 lines = block.split("\n")
-                print(repr(block))
                 text = ""
                 for line in lines:
                     text += f"{line.strip()} "
@@ -142,3 +141,14 @@ def text_to_children(text: str) -> list[HTMLNode]:
         child_nodes.append(text_node_to_html_node(node))
 
     return child_nodes
+
+
+def extract_title(markdown: str) -> str:
+    lines = markdown.split("\n")
+    for line in lines:
+        if line.startswith("# "):
+            return line
+    raise Exception("header not found")
+
+
+
