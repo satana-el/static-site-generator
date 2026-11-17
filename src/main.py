@@ -1,17 +1,23 @@
 import os
+from os.path import isdir
+import sys
 import shutil
 from generator import generate_pages_recursive
 
 def main():
-    copy_static("static", "public")
-    generate_pages_recursive("content", "template.html", "public")
+    if len(sys.argv) > 1:
+        basepath = sys.argv[1]
+    else:
+        basepath = "/"
+    copy_static("static", "docs")
+    generate_pages_recursive("content", "template.html", "docs", basepath)
 
 
 def copy_static(src: str, dst: str, is_first=True) -> None:
     src = os.path.abspath(src)
     dst = os.path.abspath(dst)
 
-    if is_first:
+    if is_first and os.path.isdir(dst):
         shutil.rmtree(dst)
 
     os.makedirs(dst, exist_ok=True)
