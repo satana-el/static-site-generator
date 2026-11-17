@@ -45,7 +45,6 @@ def generate_page(from_path, template_path, dest_path):
 
     html_file = template.replace("{{ Title }}", title)
     html_file = html_file.replace("{{ Content }}", html)
-    print(html_file)
 
     dir = os.path.dirname(dest_path)
     os.makedirs(dir, exist_ok=True)

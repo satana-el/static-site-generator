@@ -147,7 +147,8 @@ def extract_title(markdown: str) -> str:
     lines = markdown.split("\n")
     for line in lines:
         if line.startswith("# "):
-            return line
+            pre, title = line.split("# ")
+            return title
     raise Exception("header not found")
 
 
