@@ -136,4 +136,4 @@ the **same** even with inline stuff
 some text
 """
         heading = extract_title(md)
-        self.assertEqual(heading, "# Heading")
+        self.assertEqual(heading, "Heading")
