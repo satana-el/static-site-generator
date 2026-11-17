@@ -1,10 +1,10 @@
 import os
 import shutil
-from generator import generate_page
+from generator import generate_pages_recursive
 
 def main():
     copy_static("static", "public")
-    generate_page("content/index.md", "template.html", "public/index.html")
+    generate_pages_recursive("content", "template.html", "public")
 
 
 def copy_static(src: str, dst: str, is_first=True) -> None:
